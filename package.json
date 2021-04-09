@@ -1,0 +1,30 @@
+{
+  "name": "project_3_web_development",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dylanwroberts/project_3_web_development.git"
+  },
+  "keywords": [],
+  "author": "dylan roberts",
+  "contributors": [
+    "kong lee"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dylanwroberts/project_3_web_development/issues"
+  },
+  "homepage": "https://github.com/dylanwroberts/project_3_web_development#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "js2xmlparser": "^4.0.0",
+    "sqlite3": "^4.1.0"
+  }
+}

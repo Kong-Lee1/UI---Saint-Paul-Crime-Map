@@ -1,0 +1,49 @@
+* { padding: 0; margin: 0; }
+
+#navbar { display: flex; justify-content: space-between; align-items: center; padding-top: 2rem; }
+.nav-link { cursor: pointer; user-select: none; }
+
+.box { background-color: #f6f6f6; border-radius: 10px; min-height: 100px; margin-bottom: 40px; padding: 40px; }
+
+.profile-img { border-radius: 50%; width: 55%; }
+
+#stpaulmap { min-height: 600px; }
+
+#sidebar {
+    min-height: 600px;
+}
+
+input {
+    height: 38px;
+    padding: 6px 10px;
+    background-color: #fff;
+    border: 1px solid #D1D1D1;
+    border-radius: 4px;
+    box-shadow: none;
+    box-sizing: border-box;
+    margin-bottom: 1.5rem;
+}
+
+.violent {
+    background-color: #ff6262;
+}
+
+.property {
+    background-color: rgb(255, 190, 69);
+}
+
+.other {
+    background-color: #ffe555;
+}
+
+.nocrime {
+    background-color: rgb(90, 206, 90);
+}
+
+.legend {
+    font-size: 50%;
+    margin-left: 20px;
+    padding: 7px;
+    border-radius: 10px;
+    color: #000000;
+}

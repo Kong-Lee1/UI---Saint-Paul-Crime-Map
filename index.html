@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>st paul crime</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app" class="container">
+
+    <div id="navbar">
+      <h5>st paul crime</h5>
+      <p class="nav-link" @click="active = !active">{{ active ? 'about' : 'home' }}</p>
+    </div>
+
+    <div v-show="active" key="application">
+      <div class="row">
+        <!--map start-->
+        <div id="stpaulmap" class="six columns box"></div>
+        <!--map end-->
+
+        <!--sidebar start-->
+        <div id="sidebar" class="six columns box">
+          <label for="address">address</label>
+          <input class="u-full-width" type="text" v-model="address" id="address">
+
+          <div class="row">
+            <div class="six columns">
+              <label for="lat">latitude</label>
+              <input type="number" v-model="lat" class="u-full-width" id="lat">
+            </div>
+            <div class="six columns">
+              <label for="long">longitude</label>
+              <input type="number" v-model="long" class="u-full-width" id="long">
+            </div>
+          </div>
+
+          <button class="u-full-width" @click="newLatLong">go</button>
+
+          <hr>
+
+          <div class="row">
+            <div class="six columns">
+              <label for="startdate">start date</label>
+              <input class='u-full-width' id="startdate" type="date" v-model="filters.startdate">
+            </div>
+            <div class="six columns">
+              <label for="enddate">end date</label>
+              <input class='u-full-width pull' id="enddate" type="date" v-model="filters.enddate">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="six columns">
+              <label for="starttime">start time</label>
+              <input type="time" class="u-full-width" v-model="filters.starttime" id="starttime">
+            </div>
+            <div class="six columns">
+              <label for="endtime">end time</label>
+              <input type="time" class="u-full-width" v-model="filters.endtime" id="endtime">
+            </div>
+          </div>
+        </div>
+        <!--sidebar end-->
+      </div>
+
+      <!--selectors start-->
+      <div class="row">
+        <div class="six columns">
+          <h4>Select Incident Types</h4>
+          <div class="box" style="overflow-y: scroll; height: 200px;">
+            <div v-for="code in allCodes"><span>{{ code }}</span><input @change="handleCode($event, code)" type="checkbox"></div>
+          </div>
+        </div>
+        <div class="six columns">
+          <h4>Select Neighborhoods</h4>
+          <div class="box" style="overflow-y: scroll; height: 200px;">
+            <div v-for="neighborhood in neighborhoods"><span>{{ neighborhood }}</span><input @change="handleNeighborhood($event, neighborhood)" type="checkbox"></div>
+          </div>
+        </div>
+      </div>
+      <!--selectors end-->
+
+      <!--table start-->
+      <h4>Crimes on the Map
+        <span class="legend violent">violent</span>
+        <span class="legend property">property</span>
+        <span class="legend other">other</span>
+        <span class="legend nocrime">no crime</span>
+      </h4>
+      <div class="box" style="overflow-y: scroll; height: 200px;">
+        <table class="u-full-width">
+          <thead>
+            <tr>
+              <th>neighborhood</th>
+              <th>incident</th>
+              <th>date/time</th>
+              <th>block</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="incident in incidents" v-if="determineVisibility(incident)">
+              <td>{{ neighborhoods['N' + incident.neighborhood_number] }}</td>
+              <td :class="getCrimeCategory(incident.incident)">{{ incident.incident }}</td>
+              <td>{{ getDateTimeString(incident.date, incident.time) }}</td>
+              <td @click="handleTableRowClick($event, incident)">{{ incident.block }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!--table end-->
+    </div>
+
+    <!--about start-->
+    <div v-show="!active" class="box" key="about">
+      <h4>About The Project</h4>
+      <hr>
+      <div class="row">
+        <div class="four columns">
+          <img src="./assets/dylan.jpg" alt="picture of dylan" class="profile-img">
+          <h5>Dylan Roberts</h5>
+          <p>I'm Dylan, Computer Science Major. My core area of interest is fullstack web development (specifically React and Node). When I'm not enjoying a cup of coffee and programming, I'm hanging out with friends and getting involved with different programming events. What I love most about programming is that everything you learn is useful and has the potential to make a positive difference in the world.</p>
+        </div>
+        <div class="four columns">
+          <img src="./assets/kong.jpg" alt="picture of kong" class="profile-img">
+          <h5>Kong Lee</h5>
+          <p>I perfer to be called Kong for short. Computer Science Major, I have a love and hate relation for cars
+            but
+            find
+            something soothing and peaceful about wrenching on a car, kind of like cleaning. In my free time when the
+            weather
+            is nice and am not working at Hennepin County, I enjoy playing flag football, cooking/eating, traveling,
+            CARS (fixing,
+            but especially driving), canoeing and fishing, and lastly spending time with Family and friends.</p>
+        </div>
+        <div class="four columns">
+          <h4>Tech Stack</h4>
+          <ul>
+            <li><b>Vue</b> - to handle complex DOM manipulations</li>
+            <li><b>Axios</b> - http client used to get data from APIs</li>
+            <li><b>Leaflet</b> - library used for creating interactive maps</li>
+            <li><b>Nominatim</b> - API used to search for lat / long</li>
+            <li><b>Crime API</b> <em>(part 1)</em> - API used to get data about crimes in st paul</li>
+            <li><b>Skeleton</b> - framework for easily creating a simple / responsive UI</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <ul>
+          <h4>Interesting Findings</h4>
+          <ol>
+            <li>Default settings, highest crime rate in the Capitol Hill neighborhood 860 and second lowest crime rate Payne/Phalen 465</li>
+            <ul><li>fair amount of Agg Assault, weapon discharge & rape, and very common: auto theft/theft, burglary, and narcotics</li></ul>
+            <li>Most dangerous neighborhood - Frogtown (Thomas/Dale)</li>
+            <li>Least amount of incidents 67 Summit Hill - Consist of mostly theft, then burglary, vandalism, one narcotic - no violent crimes</li>
+            <li>No Bank Robberies in any neighborhood</li>
+            <li>Garage Burglary - 36 - mainly in the Frogtown, Payne/Phalen, Summit Hill and a few in the surround areas.</li>
+            <li>Most dangerous and with most narcotics? - 35 narcotic crimes - true</li>
+          </ol>
+        </ul>
+      </div>
+      <hr>
+      <h4>Youtube Video</h4>
+     <iframe width="100%" height="315" src="https://www.youtube.com/embed/tnHJrrfJNvA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <!--about end-->
+
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+
+</html>
